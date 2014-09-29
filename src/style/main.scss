@@ -1,0 +1,145 @@
+/*
+ * App-Specific Variables
+ */
+
+$fs: 16px;
+$lh: 24px;
+$white: #FFFFFF;
+
+@import 'includes';
+@import 'typography';
+
+/* vertical rhythm */
+h1, h2, h3, p, ol, ul, img {
+	margin: 0 0 $lh 0;
+}
+
+h4, h5, h6 {
+	margin: 0;
+}
+
+/*
+ * GENERAL, SITE-WIDE STYLES
+ */
+
+	body {
+		padding: $lh*2 0;
+	}
+
+	img {
+		max-width: 100%;
+	}
+
+/*
+ * HEADER
+ */
+
+	@media (max-width: 767px) {
+		.header {
+			text-align: center;
+		}
+	}
+
+/*
+ * NAVIGATION MENU
+ */
+
+	nav ul {
+		list-style-type: none;
+		padding: 0;
+	}
+	
+	nav ul li {
+		margin-bottom: $lh;
+	}
+ 
+	@media (max-width: 767px) {
+	
+		nav ul li {
+			display: inline-block;
+			margin: 0;
+			padding-right: 20px;
+		}
+	
+	}
+
+/*
+ * HOMEPAGE (IF USER LOGGED IN)
+ */
+ 
+	.user-photo {
+		border-radius: 100%;
+		float: left;
+		margin-right: 20px;
+		max-width: 20%;
+	}
+
+/*
+ * HOMEPAGE (IF USER LOGGED OUT)
+ */
+
+	.login input[type="button"] {
+		display: none;
+	}
+
+	.logged-out {
+		background: url(img/partycrowd-red.jpg);
+		border-radius: 2px;
+		color: $white;
+		margin: $lh*2 0;
+		padding: $lh*2 0;
+		text-align: center;
+	}
+
+	.logged-out h2 {
+		font-size: $fs*3;
+		line-height: $lh*3;
+	}
+	
+	@media (min-width: 768px) {
+		.logged-out {
+			margin: $lh*2 0 $lh*4;
+			padding: $lh*4 0;
+		}
+	}
+
+/*
+ * FOOTER
+ */
+ 
+	@media (max-width: 767px) {
+		.footer {
+			text-align: center;
+		}
+	}
+
+/*
+ *	UTILITY CLASSES
+ */
+
+	.loading-gif {
+		background: $white;
+		border-radius: 50px;
+		padding: 6px;
+	}
+		
+	.delete, .delete:hover {
+		color: red;
+}
+
+/*
+ * GOOGLE MAPS API
+ */
+ 
+	#currentUserPosMap {
+		display: block;
+		margin: 0 auto $lh;
+		min-height: 400px;
+		min-width: 200px;
+	}
+	
+	#currentUserPosMap img {
+		display: inline;
+		max-width: none;
+		width: auto;
+	}
