@@ -5,4 +5,4 @@ This repository contains the project code for the 'Web Application Development w
 
 The project is a simple party-planning app.
 
-When finished, the app be viewable at: http://webappmodernjs.github.io
+When finished, the app be viewable at: http://londonacademyofit.github.io (an old version of the app is hosted here currently)
