@@ -11,6 +11,7 @@ module.exports = {
         */
         packages: [
             'angular',
+            'angular-route',
             'angularfire',
             'bootstrap-sass-official'
         ],
@@ -28,6 +29,7 @@ module.exports = {
                 'firebase/firebase.js',
                 'firebase-simple-login/firebase-simple-login.js',
                 'angular/angular.js',
+                'angular-route/angular-route.js',
                 'angularfire/dist/angularfire.min.js',
                 'jquery/dist/jquery.min.js',
                 'jquery/dist/jquery.min.map'
