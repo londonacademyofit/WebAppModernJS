@@ -1,0 +1,25 @@
+<div ng-controller="UserProfileCtrl">
+
+	<div class="col-sm-3 col-md-2">
+	
+		
+	
+	</div>
+	
+	<div class="col-sm-9 col-md-10">
+	
+		<p>Welcome to the best party-planning app around. Use the menu links on the left to start creating events and inviting your friends, or to find events happening near you.</p>
+		
+		<h2>Your Profile</h2>
+		
+		<img class="user-photo" ng-src="{{ user.picture }}" ng-alt="Profile photo for {{ user.name }}">
+		
+		<p>Name: {{ user.displayName }}</p>
+		
+		<p ng-if="user.bio">About: {{ user.bio }}</p>
+		
+		<p ng-if="!user.bio">About: <a href="">Tell us a little about yourself.</a></p>
+		
+	</div>
+
+</div>
