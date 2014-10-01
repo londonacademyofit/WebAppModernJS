@@ -10,7 +10,7 @@ $white: #FFFFFF;
 @import 'typography';
 
 /* vertical rhythm */
-h1, h2, h3, p, ol, ul, img {
+h1, h2, h3, p, ol, ul, img, .form-control {
 	margin: 0 0 $lh 0;
 }
 
@@ -22,7 +22,8 @@ h4, h5, h6 {
  * GENERAL, SITE-WIDE STYLES
  */
 
-	body {
+	body, .main-content {
+		clear: both;
 		padding: $lh*2 0;
 	}
 
@@ -68,29 +69,13 @@ h4, h5, h6 {
 	}
 
 /*
- * HOMEPAGE (IF USER LOGGED IN)
+ * HOMEPAGE
  */
- 
-	.user-photo {
-		border-radius: 100%;
-		float: left;
-		margin-right: 20px;
-		max-width: 20%;
-	}
-
-/*
- * HOMEPAGE (IF USER LOGGED OUT)
- */
-
-	.login input[type="button"] {
-		display: none;
-	}
 
 	.logged-out {
 		background: url(img/partycrowd-red.jpg);
 		border-radius: 2px;
 		color: $white;
-		margin: $lh*2 0;
 		padding: $lh*2 0;
 		text-align: center;
 	}
@@ -102,9 +87,19 @@ h4, h5, h6 {
 	
 	@media (min-width: 768px) {
 		.logged-out {
-			margin: $lh*2 0 $lh*4;
 			padding: $lh*4 0;
 		}
+	}
+
+/*
+ * PROFILE PAGE
+ */
+ 
+	.user-photo {
+		border-radius: 100%;
+		float: left;
+		margin-right: 20px;
+		max-width: 20%;
 	}
 
 /*
@@ -124,6 +119,8 @@ h4, h5, h6 {
 	.loading-gif {
 		background: $white;
 		border-radius: 50px;
+		display: none;
+		margin: 0 auto $lh;
 		padding: 6px;
 	}
 		
