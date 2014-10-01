@@ -2,22 +2,38 @@ console.log(' >> executing user-profile.js');
 
 angular.module('user-profile', [])
 
-.config(['$routeProvider', function($routeProvider) {
+	.config(['$routeProvider', function($routeProvider) {
 
-  // fetch the correct HTML template / view for this module
+	  // fetch the correct HTML template for this module
 
-  $routeProvider.when('/', {
+		$routeProvider.when('/my-profile', {
 
-   	templateUrl:'js/html2js/core/user-profile/user-profile.tpl.js',
+		    controller: 'UserProfileCtrl',
 
-    controller:'UserProfileCtrl'
+		   	templateUrl: 'user-profile/user-profile.tpl.html',
 
-})
+		    resolve: {
 
-.controller('UserProfileCtrl', ['$scope', '$firebase', function($scope, $firebase) {
+		    	// controller will not be loaded until $getCurrentUser resolves
+      
+      			currentUser: ['userAuth', function(userAuth) {
+        		
+        			// $getCurrentUser returns a promise so the resolve waits for it to complete
 
-	console.log('>> UserProfileCtrl');
-	
-	// $scope.user = Hull.currentUser();
-	
-}]);
+					return userAuth.$getCurrentUser();
+      			
+      			}]
+
+		    }
+
+		})
+
+	}])
+
+	.controller('UserProfileCtrl', ['$scope', 'currentUser', 'authWatch', function($scope, currentUser, authWatch) {
+
+		console.log(' > UserProfileCtrl');
+
+		$scope.user = currentUser;
+		
+	}]);
