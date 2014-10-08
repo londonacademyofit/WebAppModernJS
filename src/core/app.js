@@ -2,7 +2,7 @@
 
 console.log(' >> executing app.js');
 
-// store some strings that we'll be using often
+// store some API keys and other useful strings
 
 var appConfig = {
 
@@ -19,7 +19,10 @@ angular.module('PartyPlannerApp', [
 	'firebase',
 	'angus.templates.app',
 	'user-profile',
-	'user-events'
+	'user-events',
+	'create-new-event',
+	'event-detail',
+	'find-events'
 
 ]);
 
@@ -31,13 +34,21 @@ angular.element(document).ready(function() {
 
 });
 
-// use $locationProvider to configure how the app's deep-linking paths are stored
+// configuration settings for our app
 
-angular.module('PartyPlannerApp').config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+angular.module('PartyPlannerApp').config(['$routeProvider', '$locationProvider', '$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
 	
+	// configure how the app's deep-linking paths are stored
+
 	$locationProvider.html5Mode(true);
+
+	// if in doubt about routing/views, show the user the home view
 	
 	$routeProvider.otherwise({redirectTo:'/'});
+
+	// 
+
+	delete $httpProvider.defaults.headers.common["X-Requested-With"];
 
 }]);
 
@@ -53,7 +64,7 @@ angular.module('PartyPlannerApp').factory('userAuth', ['$firebaseSimpleLogin', f
 
 // this factory watches for changes in the user's authentication status
 
-angular.module('PartyPlannerApp').factory('authWatch', ['$location', 'userAuth', function($location, $userAuth) {
+angular.module('PartyPlannerApp').factory('authWatch', ['$location', function($location) {
 
 	var authRef = new Firebase(appConfig.firebaseUrl + '/.info/authenticated');
 
@@ -144,11 +155,14 @@ angular.module('PartyPlannerApp')
 
 				var firebaseRef = new Firebase(appConfig.firebaseUrl);
 
+				// bug: this currently overwrites all user data, incl. events
+
 				firebaseRef.child('users').child(user.uid).set({
 
 					displayName: user.displayName,
 					provider: user.provider,
 					provider_id: user.id,
+					// need function to remove '_normal' from end of image URL
 					picture: user.thirdPartyUserData.profile_image_url
 				
 				});
@@ -159,7 +173,30 @@ angular.module('PartyPlannerApp')
 
 		});
 
-		// if the user is already logged in, send them to their profile page
+		$('input[type="button"].login-facebook').click(function() {
+			
+			userAuth.$login('facebook').then(function(user) {
+
+				// when a user logs in, set/update their Firebase entry
+
+				var firebaseRef = new Firebase(appConfig.firebaseUrl);
+
+				firebaseRef.child('users').child(user.uid).set({
+
+					displayName: user.displayName,
+					provider: user.provider,
+					provider_id: user.id,
+					picture: user.thirdPartyUserData.picture.data.url
+				
+				});
+
+				console.log('Logged in with Facebook');
+
+			});
+
+		});
+
+		// if the user is already logged in, show them their profile
 
 		if (currentUser) {
 

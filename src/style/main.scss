@@ -10,7 +10,7 @@ $white: #FFFFFF;
 @import 'typography';
 
 /* vertical rhythm */
-h1, h2, h3, p, ol, ul, img, .form-control {
+h1, h2, h3, p, ol, ul, img, .form-control, .btn {
 	margin: 0 0 $lh 0;
 }
 
@@ -73,7 +73,8 @@ h4, h5, h6 {
  */
 
 	.logged-out {
-		background: url(img/partycrowd-red.jpg);
+		background: url(img/partycrowd-red.jpg) no-repeat;
+		background-size: cover;
 		border-radius: 2px;
 		color: $white;
 		padding: $lh*2 0;
