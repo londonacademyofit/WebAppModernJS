@@ -11,7 +11,7 @@ var appConfig = {
 
 };
 
-// create an Angular module representing our app, registering its component modules
+// create an Angular module representing our app and register its component modules
 
 angular.module('PartyPlannerApp', [
 
@@ -22,7 +22,8 @@ angular.module('PartyPlannerApp', [
 	'user-events',
 	'create-new-event',
 	'event-detail',
-	'find-events'
+	'find-events',
+	'user-invites'
 
 ]);
 
@@ -155,9 +156,7 @@ angular.module('PartyPlannerApp')
 
 				var firebaseRef = new Firebase(appConfig.firebaseUrl);
 
-				// bug: this currently overwrites all user data, incl. events
-
-				firebaseRef.child('users').child(user.uid).set({
+				firebaseRef.child('users').child(user.uid).update({
 
 					displayName: user.displayName,
 					provider: user.provider,

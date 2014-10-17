@@ -30,9 +30,11 @@ angular.module('event-detail', [])
 
 	}])
 
-	.controller('EventDetailCtrl', ['$scope', '$location', '$routeParams', 'currentUser', 'authWatch', '$firebase', function($scope, $location, $routeParams, currentUser, authWatch, $firebase) {
+	.controller('EventDetailCtrl', ['$scope', '$routeParams', 'currentUser', 'authWatch', '$firebase', function($scope, $routeParams, currentUser, authWatch, $firebase) {
 
 		console.log(' > EventDetailCtrl');
+
+		// get the event's details from its Firebase section
 
 		var userId = currentUser.provider + ':' + currentUser.id;
 		
@@ -41,5 +43,140 @@ angular.module('event-detail', [])
 		var event = $firebase(eventRef);
 
 		$scope.event = event.$asObject();
+
+		// invite/uninvite code below here
+
+		$scope.inviteUser = function(user) {
+
+			var invitesRef = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + user.$id + '/invites'));
+
+			invitesRef.$push({
+				eventId: $scope.event.$id,
+				eventName: $scope.event.name
+			});
+		
+			$scope.updateInviteLists();
+
+		};
+
+		$scope.uninviteUser = function(user) {
+
+			// check each invite in this user's invites section
+
+			var invitesRef = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + user.$id + '/invites'));
+
+			var invitesObj = invitesRef.$asObject();
+
+			invitesObj.$loaded().then(function(invites) {
+
+				angular.forEach(invites, function(value, key) {
+
+					// if an invite for this event exists, remove it
+
+					if (value.eventId === $routeParams.eventId) {
+
+						var inviteRef = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + user.$id + '/invites/' + key));
+
+						inviteRef.$remove();
+
+						$scope.updateInviteLists();
+
+					}
+
+				});
+
+			});
+
+		};
+
+		$scope.updateInviteLists = function() {
+
+			$scope.invitedList = [];
+
+			$scope.uninvitedList = [];
+
+			var usersObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/')).$asObject();
+
+			usersObj.$loaded().then(function(users) {
+
+				// iterate through each user
+
+				angular.forEach(users, function(value, key) {
+
+					var userObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + key)).$asObject();
+
+					// (except the current user)
+
+					if (key !== userId) {
+
+						// add all users to the uninvited list first
+
+						$scope.uninvitedList.push(userObj);
+
+						// now check each user's invites (if they have any)
+
+						userObj.$loaded().then(function(user) {
+
+							if (userObj.hasOwnProperty('invites')) {
+
+								var invitesObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + key + '/invites')).$asObject();
+
+								invitesObj.$loaded().then(function(invites) {
+
+									// check whether this user's invites contains one to this event
+
+									angular.forEach(invites, function(invite, inviteId) {
+
+										var inviteObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + key + '/invites/' + inviteId)).$asObject();
+
+										inviteObj.$loaded().then(function(invite) {
+
+											if (invite.eventId == $routeParams.eventId) {
+
+												// add to 'invited' list, if not there already
+
+												if ($.inArray(userObj, $scope.invitedList) === -1) {
+
+													$scope.invitedList.push(userObj);
+
+												}
+
+												// remove from 'uninvited' list
+
+												$scope.uninvitedList = jQuery.grep($scope.uninvitedList, function(value) {
+									
+													return value.displayName != userObj.displayName;
+												
+												});
+
+											}
+
+										});
+
+									});
+
+								});
+
+							} else {
+
+								if ($.inArray(userObj, $scope.uninvitedList) === -1) {
+
+									$scope.uninvitedList.push(userObj);
+
+								}
+
+							}
+
+						});
+
+					}
+
+				});
+
+			});
+
+		};
+
+		$scope.updateInviteLists();
 		
 	}]);

@@ -56,19 +56,20 @@ angular.module('find-events', [])
 
 		$scope.getCurrentUserPosition = function() {
 		
-			// If the browser supports the Geolocation API...
+			// If the browser supports geolocation...
 
 			if (navigator.geolocation) {
 
 				console.log('Getting current user position...');
 			
-				// ...get the current user's position - success: showMap(), fail: geoError()
+				// ...get the current user's position, success: showMap(), fail: geoError()
 
 				navigator.geolocation.getCurrentPosition($scope.showMap, $scope.geoError, {timeout: 75000, maximumAge: 600000});
 			
 			} else {
 			
 				// ...a backup library would go here
+
 				console.log('No native support for this API');
 			
 			};
@@ -94,7 +95,7 @@ angular.module('find-events', [])
 
 	        $scope.map = new google.maps.Map($scope.mapDiv, $scope.currentUserPosOptions);
 	        
-	        // Add a marker to the map to show the current use position
+	        // Add a marker to the map to show the current user position
 
 	        $scope.userMarker = new google.maps.Marker({
 	        
@@ -117,17 +118,17 @@ angular.module('find-events', [])
 
 			// connect to the /users/ section of the Firebase to get a 'users' object
 
-			var usersFB = $firebase(new Firebase(appConfig.firebaseUrl + '/users'));
+			var usersRef = $firebase(new Firebase(appConfig.firebaseUrl + '/users'));
 
-			var usersObj = usersFB.$asObject();
+			var usersObj = usersRef.$asObject();
 
 			usersObj.$loaded().then(function(users) {
 
 				// iterate through each user's /events/ section to get 'events' objects
 
-				angular.forEach(users, function(value, key) {
+				angular.forEach(users, function(user, userId) {
 
-		          var eventsFB = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + key + '/events/'));
+		          var eventsFB = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + userId + '/events/'));
 
 		          var eventsObj = eventsFB.$asObject();
 
@@ -137,17 +138,15 @@ angular.module('find-events', [])
 
 		          	angular.forEach(events, function(event, key) {
 
-		          		// check if a location key exists in the event object first
+		          		// check if a location key ([lat, long]) exists in the event object
 
 		          		if ( event.hasOwnProperty('location') ) {
 
-		          			console.log('LatLong:', event.location[0], event.location[1]);
+		          			// use the location array's contents to find the distance of the event from the user
 
-		          			// use the location's lat/long values to find the distance of the event from the user
-		          			// ...if the event is near the current user...
 							if ($scope.findDistance($scope.currentUserLat, $scope.currentUserLong, event.location[0], event.location[1]) < 5) {
 								
-								// ...create an EventInfoWindow (marker) for it...
+								// create an EventInfoWindow (marker) for the event
 								eventInfoWindows[key] = new google.maps.InfoWindow({
 								
 									content: '<b>' + event.name + '</b><br>' + event.description
