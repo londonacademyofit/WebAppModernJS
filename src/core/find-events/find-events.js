@@ -112,15 +112,9 @@ angular.module('find-events', [])
 
 		$scope.eventsNearUser = function() {
 
-			// this empty array will be filled with event info from the Firebase
-
-			var eventInfoWindows = [];
-
 			// connect to the /users/ section of the Firebase to get a 'users' object
 
-			var usersRef = $firebase(new Firebase(appConfig.firebaseUrl + '/users'));
-
-			var usersObj = usersRef.$asObject();
+			var usersObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users')).$asObject();
 
 			usersObj.$loaded().then(function(users) {
 
@@ -128,54 +122,65 @@ angular.module('find-events', [])
 
 				angular.forEach(users, function(user, userId) {
 
-		          var eventsFB = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + userId + '/events/'));
+		        	var eventsObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + userId + '/events/')).$asObject();
 
-		          var eventsObj = eventsFB.$asObject();
+		        	eventsObj.$loaded().then(function(events) {
 
-		          eventsObj.$loaded().then(function(events) {
+			          	// iterate through each event in the 'events' objects
 
-		          	// iterate through each event to get lat/long data
+			          	angular.forEach(events, function(event, eventId) {
 
-		          	angular.forEach(events, function(event, key) {
+			          		var eventObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + userId + '/events/' + eventId)).$asObject();
 
-		          		// check if a location key ([lat, long]) exists in the event object
+			          		if ( event.hasOwnProperty('location') ) {
 
-		          		if ( event.hasOwnProperty('location') ) {
+								$scope.putEventOnMap(eventObj);
 
-		          			// use the location array's contents to find the distance of the event from the user
+			          		};
 
-							if ($scope.findDistance($scope.currentUserLat, $scope.currentUserLong, event.location[0], event.location[1]) < 5) {
-								
-								// create an EventInfoWindow (marker) for the event
-								eventInfoWindows[key] = new google.maps.InfoWindow({
-								
-									content: '<b>' + event.name + '</b><br>' + event.description
-								
-								});
-								
-								// ...and add that marker to the map
-								eventInfoWindows[key].open($scope.map, new google.maps.Marker({
-							
-									position: new google.maps.LatLng(event.location[0], event.location[1]),
-							
-									map: $scope.map
-							
-								  }));
-				
-							} else {
-							
-								console.log(event.name + ' is more than 5km away from user');
-							
-							}
+			          	});
 
-
-		          		};
-
-		          	});
-
-		          });
+		        	});
 
 		       });
+
+			});
+
+		};
+
+		var eventInfoWindows = [];
+
+		$scope.putEventOnMap = function(eventObj) {
+
+			eventObj.$loaded().then(function(event) {
+
+				// if an event is near the user
+
+				if ($scope.findDistance($scope.currentUserLat, $scope.currentUserLong, event.location[0], event.location[1]) < 5) {
+										
+					// create an EventInfoWindow (marker) for the event
+
+					eventInfoWindows[event.$id] = new google.maps.InfoWindow({
+					
+						content: '<b>' + event.name + '</b><br>' + event.description
+					
+					});
+					
+					// ...and add that marker to the map
+
+					eventInfoWindows[event.$id].open($scope.map, new google.maps.Marker({
+				
+						position: new google.maps.LatLng(event.location[0], event.location[1]),
+				
+						map: $scope.map
+				
+					  }));
+
+				} else {
+				
+					console.log(event.name + ' is more than 5km away from user');
+				
+				}
 
 			});
 

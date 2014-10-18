@@ -89,23 +89,51 @@ angular.module('event-detail', [])
 
 		};
 
+		$scope.findMatchingInvite = function(user) {
+
+			var invitesObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + user.$id + '/invites')).$asObject();
+
+			invitesObj.$loaded().then(function(invites) {
+
+				// check whether this user's invites contains one to this event
+
+				angular.forEach(invites, function(value, key) {
+
+					var inviteObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + user.$id + '/invites/' + key)).$asObject();
+
+					inviteObj.$loaded().then(function(invite) {
+
+						if (invite.eventId == $routeParams.eventId) {
+
+							$scope.isInvited(user);
+
+						}
+
+					});
+
+				});
+
+			});
+
+		};
+
 		$scope.updateInviteLists = function() {
 
 			$scope.invitedList = [];
 
 			$scope.uninvitedList = [];
 
+			// get an object representing each user in the Firebase
+
 			var usersObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/')).$asObject();
 
 			usersObj.$loaded().then(function(users) {
 
-				// iterate through each user
+				// iterate through each user in the Users object (except the current user)
 
 				angular.forEach(users, function(value, key) {
 
 					var userObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + key)).$asObject();
-
-					// (except the current user)
 
 					if (key !== userId) {
 
@@ -117,53 +145,13 @@ angular.module('event-detail', [])
 
 						userObj.$loaded().then(function(user) {
 
-							if (userObj.hasOwnProperty('invites')) {
+							if (user.hasOwnProperty('invites')) {
 
-								var invitesObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + key + '/invites')).$asObject();
-
-								invitesObj.$loaded().then(function(invites) {
-
-									// check whether this user's invites contains one to this event
-
-									angular.forEach(invites, function(invite, inviteId) {
-
-										var inviteObj = $firebase(new Firebase(appConfig.firebaseUrl + '/users/' + key + '/invites/' + inviteId)).$asObject();
-
-										inviteObj.$loaded().then(function(invite) {
-
-											if (invite.eventId == $routeParams.eventId) {
-
-												// add to 'invited' list, if not there already
-
-												if ($.inArray(userObj, $scope.invitedList) === -1) {
-
-													$scope.invitedList.push(userObj);
-
-												}
-
-												// remove from 'uninvited' list
-
-												$scope.uninvitedList = jQuery.grep($scope.uninvitedList, function(value) {
-									
-													return value.displayName != userObj.displayName;
-												
-												});
-
-											}
-
-										});
-
-									});
-
-								});
+								$scope.findMatchingInvite(user);
 
 							} else {
 
-								if ($.inArray(userObj, $scope.uninvitedList) === -1) {
-
-									$scope.uninvitedList.push(userObj);
-
-								}
+								$scope.isNotInvited(user);
 
 							}
 
@@ -174,6 +162,38 @@ angular.module('event-detail', [])
 				});
 
 			});
+
+		};
+
+		$scope.isInvited = function(user) {
+
+			// add to 'invited' list, if not there already
+
+			if ($.inArray(user, $scope.invitedList) === -1) {
+
+				$scope.invitedList.push(user);
+
+			}
+
+			// remove from 'uninvited' list
+
+			$scope.uninvitedList = jQuery.grep($scope.uninvitedList, function(value) {
+
+				return value.displayName != user.displayName;
+			
+			});
+
+		};
+
+		$scope.isNotInvited = function(user) {
+
+			// add to 'uninvited' list, if not there already
+
+			if ($.inArray(user, $scope.uninvitedList) === -1) {
+
+				$scope.uninvitedList.push(user);
+
+			}
 
 		};
 

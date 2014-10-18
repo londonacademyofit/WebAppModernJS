@@ -22,8 +22,8 @@ angular.module('PartyPlannerApp', [
 	'user-events',
 	'create-new-event',
 	'event-detail',
-	'find-events',
-	'user-invites'
+	'user-invites',
+	'find-events'
 
 ]);
 
@@ -46,8 +46,6 @@ angular.module('PartyPlannerApp').config(['$routeProvider', '$locationProvider',
 	// if in doubt about routing/views, show the user the home view
 	
 	$routeProvider.otherwise({redirectTo:'/'});
-
-	// 
 
 	delete $httpProvider.defaults.headers.common["X-Requested-With"];
 
@@ -90,6 +88,8 @@ angular.module('PartyPlannerApp').factory('authWatch', ['$location', function($l
 		}
 
 	});
+
+	return true;
 
 }]);
 

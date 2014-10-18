@@ -13,6 +13,7 @@ module.exports = {
             'angular',
             'angular-route',
             'angularfire',
+            'angular-mocks',
             'bootstrap-sass-official'
         ],
         /*  filesNeeded - A list of files your app will actually use from the bower packages you installed.
@@ -31,6 +32,7 @@ module.exports = {
                 'angular/angular.js',
                 'angular-route/angular-route.js',
                 'angularfire/dist/angularfire.min.js',
+                'angular-mocks/angular-mocks.js',
                 'jquery/dist/jquery.min.js',
                 'jquery/dist/jquery.min.map'
             ],
